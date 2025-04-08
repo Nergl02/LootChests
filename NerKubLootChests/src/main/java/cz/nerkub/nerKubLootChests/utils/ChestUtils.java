@@ -18,9 +18,10 @@ public class ChestUtils {
 
 			for (var locMap : chest.getMapList("locations")) {
 				Location storedLoc = Location.deserialize((Map<String, Object>) locMap);
-				if (storedLoc.equals(loc)) {
+				if (storedLoc.getWorld().equals(loc.getWorld()) && storedLoc.getBlock().getLocation().equals(loc.getBlock().getLocation())) {
 					return chestName;
 				}
+
 			}
 		}
 

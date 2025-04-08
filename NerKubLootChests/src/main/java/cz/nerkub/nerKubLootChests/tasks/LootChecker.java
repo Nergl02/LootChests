@@ -35,6 +35,14 @@ public class LootChecker implements Runnable {
 				Location loc = Location.deserialize((Map<String, Object>) raw);
 				if (loc.getWorld() == null) continue;
 
+				long locationLast = 0;
+				Object rawLast = raw.get("lastRefreshed");
+				if (rawLast instanceof Number) {
+					locationLast = ((Number) rawLast).longValue();
+				}
+
+				long finalLocationLast = locationLast; // <- tohle udělá z proměnné immutable kopii
+
 				Bukkit.getScheduler().runTask(NerKubLootChests.getInstance(), () -> {
 					Block block = loc.getBlock();
 					if (block.getType() != Material.CHEST) return;
@@ -46,12 +54,14 @@ public class LootChecker implements Runnable {
 							.filter(Objects::nonNull)
 							.anyMatch(i -> i.getType() != Material.AIR);
 
-					if (!hasItems && now - last < interval) {
-						int timeLeft = (int) (interval - (now - last));
+					if (!hasItems && now - finalLocationLast < interval) {
+						int timeLeft = (int) (interval - (now - finalLocationLast));
 						HologramManager.spawnCountdown(loc, chestName, timeLeft);
 					}
 				});
+
 			}
+
 		}
 	}
 }

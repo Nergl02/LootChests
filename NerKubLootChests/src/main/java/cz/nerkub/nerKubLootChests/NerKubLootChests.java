@@ -22,6 +22,7 @@ public final class NerKubLootChests extends JavaPlugin {
 	private static NerKubLootChests plugin;
 	private YamlConfiguration chestData;
 	private File chestFile;
+	private CheckUpdatesGitHub checkUpdatesGitHub;
 
 	@Override
 	public void onEnable() {
@@ -52,12 +53,16 @@ public final class NerKubLootChests extends JavaPlugin {
 
 		Bukkit.getConsoleSender().sendMessage("");
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|\\   |  | /	&aPlugin: &6NerKub LootChests"));
-		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3| \\  |  |/	&aVersion: &bv1.0.0"));
+		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3| \\  |  |/	&aVersion: &bv1.0.2"));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|  \\ |  |\\	&aAuthor: &3NerKub Studio"));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|   \\|  | \\	&aPremium: &bThis plugin is a premium resource."));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', " "));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3| Visit our Discord for more! &ahttps://discord.gg/YXm26egK6g"));
 		Bukkit.getConsoleSender().sendMessage("");
+
+		checkUpdatesGitHub = new CheckUpdatesGitHub(this);
+		checkUpdatesGitHub.checkForUpdates();
+		getServer().getPluginManager().registerEvents(new JoinListener(checkUpdatesGitHub), this);
 
 		// 🧠 Task schedulers
 		Bukkit.getScheduler().runTaskTimerAsynchronously(this, new ChestRefresher(), 20L, 20L);     // každou sekundu

@@ -8,11 +8,13 @@ cz\nerkub\nerKubLootChests\gui\EditChestMenu.class
 cz\nerkub\nerKubLootChests\listeners\ChestPlaceBreakListener.class
 cz\nerkub\nerKubLootChests\listeners\EditChestMenuListener.class
 cz\nerkub\nerKubLootChests\utils\YamlUpdater.class
+cz\nerkub\nerKubLootChests\listeners\JoinListener.class
 cz\nerkub\nerKubLootChests\utils\ChestUtils.class
 cz\nerkub\nerKubLootChests\utils\LootParser.class
 cz\nerkub\nerKubLootChests\managers\HologramUpdater.class
 cz\nerkub\nerKubLootChests\utils\ConfirmDeleteCache.class
 cz\nerkub\nerKubLootChests\gui\ChanceEditorMenu.class
+cz\nerkub\nerKubLootChests\CheckUpdatesGitHub.class
 cz\nerkub\nerKubLootChests\listeners\AddLootItemsListener.class
 cz\nerkub\nerKubLootChests\listeners\ConfirmDeleteMenuListener.class
 cz\nerkub\nerKubLootChests\listeners\EditLootItemsListener.class

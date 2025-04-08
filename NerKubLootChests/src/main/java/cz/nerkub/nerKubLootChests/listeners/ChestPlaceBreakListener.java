@@ -78,9 +78,14 @@ public class ChestPlaceBreakListener implements Listener {
 		Player player = event.getPlayer();
 
 		if (!(block.getState() instanceof Chest chest)) return;
+		Location loc1 = chest.getLocation();
+		String chestName = ChestUtils.getChestNameAtLocation(loc1);
+		if (chestName == null) {
+			return;
+		}
+
 		if (!HologramManager.isFromPluginChest(chest)) return;
 
-		String chestName = ChestUtils.getChestNameAtLocation(chest.getLocation());
 		if (chestName == null) return;
 
 		// 🗂️ Odstranit lokaci z chests.yml

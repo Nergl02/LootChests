@@ -22,11 +22,7 @@ public class ConfirmDeleteMenuListener implements Listener {
 		if (clicked == null || clicked.getType() == Material.AIR) return;
 
 		String chestName = ConfirmDeleteCache.get(player);
-		if (chestName == null) {
-			player.sendMessage(MessageManager.get("messages.delete_cache_missing"));
-			player.closeInventory();
-			return;
-		}
+		if (chestName == null) return; // ✅ Než cokoli jiného, ověř že existuje session
 
 		String expectedTitle = ChatColor.stripColor(MessageManager.get("gui.confirm_delete_title", "chest", chestName));
 		String actualTitle = ChatColor.stripColor(e.getView().getTitle());
@@ -47,4 +43,5 @@ public class ConfirmDeleteMenuListener implements Listener {
 
 		ConfirmDeleteCache.remove(player);
 	}
+
 }

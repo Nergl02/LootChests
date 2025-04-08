@@ -119,3 +119,4 @@ messages:
   placed: "{prefix}&aLootChest '{name}' was successfully placed."
   not_registered: "{prefix}&cLootChest type '{name}' is not registered."
   broken: "{prefix}&eLootChest '{name}' was removed."
+  loot_failed: "{prefix}&cFailed to identify chest type at this location."
