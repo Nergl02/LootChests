@@ -1,0 +1,16 @@
+debug: false
+
+hologram-format: "&e%displayName% &7(refresh in &a%timeLeftFormatted%&7)"
+hologram-filled-format: "&e%displayName% &7(loot &f%itemsLeft% items&7)"
+
+
+# 🧠 How much weight each rarity gets in loot distribution (must total 100%)
+rarity-pools:
+  COMMON: 60        # 60% of filled items should be from COMMON pool
+  UNCOMMON: 25      # 25% of items should be from UNCOMMON
+  RARE: 10          # 10% from RARE
+  EPIC: 4           # 4% from EPIC
+  LEGENDARY: 1      # 1% from LEGENDARY
+
+# 🎯 This ratio will guide how many items are chosen per rarity tier
+# Example: If 5 items are to be selected, and RARE has 10%, then ~0.5 (rounded up/down) will come from RARE pool

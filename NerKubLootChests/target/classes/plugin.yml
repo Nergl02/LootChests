@@ -1,0 +1,15 @@
+name: NerKubLootChests
+version: '1.0.0'
+main: cz.nerkub.nerKubLootChests.NerKubLootChests
+api-version: '1.21'
+
+permissions:
+  lootchest.admin:
+    description: Umožňuje správu lootchest příkazů
+    default: op
+
+commands:
+  lootchest:
+    description: LootChest management command
+    usage: /lootchest <create|add|loottime>
+    aliases: [lc]

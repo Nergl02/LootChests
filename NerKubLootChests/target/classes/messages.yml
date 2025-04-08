@@ -1,0 +1,121 @@
+prefix: "&7[&6LootChests&7]&r "
+
+gui:
+  back: "&cBack"
+  save: "&aSave changes"
+  cancel: "&cCancel and go back"
+  edit_chest_title: "Edit: {chest}"
+  loot_items_title: "Loot Items: {chest}"
+  chance_editor_title: "Chance Editor"
+
+  current_chance_lore:
+    - "&eCurrent Chance: &a{chance}%"
+    - "&eRarity: {rarity_color}{rarity}"
+  chance_plus_10: "&a+10%"
+  chance_plus_1: "&a+1%"
+  chance_minus_1: "&c-1%"
+  chance_minus_10: "&c-10%"
+
+  confirm_delete_title: "Confirm Deletion: {chest}"
+  confirm_delete_yes: "&aYes, delete"
+  confirm_delete_yes_lore:
+    - "&7This will permanently delete:"
+    - "&c{chest}"
+  confirm_delete_no: "&cNo, go back"
+  confirm_delete_no_lore:
+    - "&7Return to edit menu"
+
+  rarity_common: "&7COMMON"
+  rarity_uncommon: "&aUNCOMMON"
+  rarity_rare: "&9RARE"
+  rarity_epic: "&dEPIC"
+  rarity_legendary: "&6LEGENDARY"
+
+  add_items_title: "Add Items: {chest}"
+  confirm_add_items: "&aConfirm adding"
+  cancel_add_items: "&cCancel"
+
+  display_name_button: "&eDisplay Name"
+  display_name_lore:
+    - "&7Current: {value}"
+    - ""
+    - "&eClick to change"
+
+  refresh_time_button: "&bSet Refresh Time"
+  refresh_time_lore:
+    - "&7Current: {value}s"
+    - ""
+    - "&eClick to change"
+
+  items_per_refresh_button: "&dItems per Refresh"
+  items_per_refresh_lore:
+    - "&7Current: {value}"
+    - ""
+    - "&eClick to change"
+
+  edit_loot_items_button: "&aEdit Loot Items"
+  add_items_button: "&aAdd Items"
+  delete_button: "&cDelete Chest"
+
+  loot_item_lore:
+    - "&7Chance: &a{chance}%"
+    - "&7Rarity: &e{rarity}"
+    - ""
+    - "&eLeft Click: edit"
+    - "&cShift + Right Click: delete"
+
+messages:
+  reloaded: "{prefix}&all configuration files have been reloaded."
+  not_player: "{prefix}&cOnly players can use this command."
+  no_permission: "{prefix}&cYou don't have permission to use this command."
+  usage: "{prefix}&cUsage: /lootchest <create|add|loottime|edit|delete|get>"
+  subcommand_invalid: "{prefix}&cInvalid subcommand."
+
+  usage_create: "{prefix}&cUsage: /lootchest create <chestName>"
+  already_exists: "{prefix}&cA loot chest with that name already exists!"
+  created: "{prefix}&aChest '{name}' was created and added to your inventory."
+  create_error: "{prefix}&cAn error occurred while saving the chest."
+
+  usage_add: "{prefix}&cUsage: /lootchest add <chestName> <percent>"
+  invalid_chance: "{prefix}&cPlease enter a valid percentage between 0 and 100."
+  must_hold_item: "{prefix}&cYou must be holding an item in your main hand."
+  chest_not_found: "{prefix}&cLoot chest '{name}' does not exist."
+  added_item: "{prefix}&aItem added to chest '{name}' with a chance of {chance}%."
+  added_items: "{prefix}&a{count} items have been added to chest '{name}'."
+  canceled_add: "{prefix}&7Item adding canceled."
+
+  saved_changes: "{prefix}&aSaved! Chance: &a{chance}%, Rarity: {rarity_color}{rarity}"
+  invalid_index: "{prefix}&cFailed to save – invalid index."
+  edit_canceled: "{prefix}&7Changes have been canceled."
+
+  usage_loottime: "{prefix}&cUsage: /lootchest loottime <chestName> <seconds>"
+  invalid_time: "{prefix}&cPlease enter a valid time in seconds (> 0)."
+  time_updated: "{prefix}&aRefresh time for chest '{name}' set to {time} seconds."
+
+  usage_delete: "{prefix}&cUsage: /lootchest delete <chestName>"
+  invalid_delete: "{prefix}&cLoot chest '{name} does not exists.'"
+  deleted: "{prefix}&aLoot chest '{name}' was removed from {count} locations and deleted."
+
+  usage_get: "{prefix}&cUsage: /lootchest get <chestName>"
+  given: "{prefix}&aYou have received loot chest '{name}'."
+  delete_cache_missing: "{prefix}&cError – chest name could not be found."
+  delete_cancelled: "{prefix}&7Cancelled. Chest was not deleted."
+
+  usage_edit: "{prefix}&cUsage: /lootchest edit <chestName>"
+
+  chat_display_name: "{prefix}&7Type a new &eDisplay Name &7in the chat..."
+  chat_refresh_time: "{prefix}&7Type new &brefreshTime &7in seconds..."
+  chat_items_per_refresh: "{prefix}&7Type new &ditem count &7per refresh..."
+
+  removed_item: "{prefix}&cItem has been removed from the loot pool."
+  item_not_found: "{prefix}&eCould not find the item."
+
+  display_name_set: "{prefix}&aDisplay name set to: &f{value}"
+  refresh_time_set: "{prefix}&aRefresh time set to &b{time}s"
+  items_per_refresh_set: "{prefix}&aItems per refresh set to &d{amount}"
+  invalid_time_input: "{prefix}&cInvalid input. Enter a valid number greater than 0."
+  invalid_item_amount: "{prefix}&cInvalid amount. Please enter a valid number greater than 0."
+
+  placed: "{prefix}&aLootChest '{name}' was successfully placed."
+  not_registered: "{prefix}&cLootChest type '{name}' is not registered."
+  broken: "{prefix}&eLootChest '{name}' was removed."
