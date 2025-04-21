@@ -74,19 +74,27 @@ public class ChestPlaceBreakListener implements Listener {
 	public void onBlockBreak(BlockBreakEvent event) {
 		if (event.getBlock().getType() != Material.CHEST) return;
 
-		Block block = event.getBlock();
-		Player player = event.getPlayer();
-
-		if (!(block.getState() instanceof Chest chest)) return;
-		Location loc1 = chest.getLocation();
-		String chestName = ChestUtils.getChestNameAtLocation(loc1);
-		if (chestName == null) {
+		// ❌ Jen hráč smí ničit chestku (žádný výbuch, mob atd.)
+		if (!(event.getPlayer() instanceof Player player)) {
+			event.setCancelled(true);
 			return;
 		}
 
-		if (!HologramManager.isFromPluginChest(chest)) return;
+		Block block = event.getBlock();
 
-		if (chestName == null) return;
+		if (!(block.getState() instanceof Chest chest)) return;
+		Location loc1 = chest.getLocation();
+
+		// 🧠 Najdi název chestky
+		String chestName = ChestUtils.getChestNameAtLocation(loc1);
+		if (chestName == null || !HologramManager.isFromPluginChest(chest)) return;
+
+		// 🔒 Permission check
+		if (!player.hasPermission("lootchest.admin")) {
+			event.setCancelled(true);
+			player.sendMessage(MessageManager.get("messages.no_permission"));
+			return;
+		}
 
 		// 🗂️ Odstranit lokaci z chests.yml
 		YamlConfiguration data = NerKubLootChests.getInstance().getChestData();

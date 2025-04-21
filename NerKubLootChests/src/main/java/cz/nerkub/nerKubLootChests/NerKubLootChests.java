@@ -48,12 +48,13 @@ public final class NerKubLootChests extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new AddLootItemsListener(), this);
 		getServer().getPluginManager().registerEvents(new EditLootItemsListener(), this);
 		getServer().getPluginManager().registerEvents(new ChanceEditorListener(), this);
+		getServer().getPluginManager().registerEvents(new AntiExplosionListener(), this);
 
 		MessageManager.init(this);
 
 		Bukkit.getConsoleSender().sendMessage("");
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|\\   |  | /	&aPlugin: &6NerKub LootChests"));
-		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3| \\  |  |/	&aVersion: &bv1.0.2"));
+		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3| \\  |  |/	&aVersion: &bv1.0.3"));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|  \\ |  |\\	&aAuthor: &3NerKub Studio"));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&3|   \\|  | \\	&aPremium: &bThis plugin is a premium resource."));
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', " "));

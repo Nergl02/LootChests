@@ -3,6 +3,7 @@ cz\nerkub\nerKubLootChests\enums\Rarity.class
 cz\nerkub\nerKubLootChests\utils\TempItemCache$EditingItemInfo.class
 cz\nerkub\nerKubLootChests\utils\ItemSerializer.class
 cz\nerkub\nerKubLootChests\model\LootItem.class
+cz\nerkub\nerKubLootChests\listeners\AntiExplosionListener.class
 cz\nerkub\nerKubLootChests\commands\LootChestCommand.class
 cz\nerkub\nerKubLootChests\gui\EditChestMenu.class
 cz\nerkub\nerKubLootChests\listeners\ChestPlaceBreakListener.class
