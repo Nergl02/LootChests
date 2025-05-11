@@ -6,7 +6,7 @@
 
     <groupId>cz.nerkub</groupId>
     <artifactId>NerKubLootChests</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <packaging>jar</packaging>
 
     <name>NerKubLootChests</name>

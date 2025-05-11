@@ -3,7 +3,6 @@ package cz.nerkub.nerKubLootChests.listeners;
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import cz.nerkub.nerKubLootChests.managers.MessageManager;
-import cz.nerkub.nerKubLootChests.utils.ChestUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
@@ -31,30 +31,34 @@ public class ChestInteractListener implements Listener {
 		Inventory inv = player.getOpenInventory().getTopInventory();
 		if (inv.getType() != org.bukkit.event.inventory.InventoryType.CHEST) return;
 
-		// 📍 Najdi chest block, na který hráč míří
+		// 🎯 Získání truhly podle mířeného bloku
 		Block block = player.getTargetBlockExact(5);
 		if (block == null || !(block.getState() instanceof Chest chest)) return;
 
-		String chestName = ChestUtils.getChestNameAtLocation(chest.getLocation());
-		if (chestName == null) {
-			player.sendMessage(MessageManager.get("messages.loot_failed"));
-			return;
-		}
+		// ✅ Ověření, zda chestka má pluginový PersistentData tag
+		var container = chest.getPersistentDataContainer();
+		if (!container.has(CHEST_KEY, PersistentDataType.STRING)) return;
+
+		String chestName = container.get(CHEST_KEY, PersistentDataType.STRING);
+		if (chestName == null) return;
+
+		YamlConfiguration chestData = NerKubLootChests.getInstance().getChestData();
+		if (!chestData.contains("chests." + chestName)) return;
 
 		Inventory chestInv = chest.getInventory();
 
+		// 🧠 Odloženo o 1 tick kvůli async click eventu
 		Bukkit.getScheduler().runTaskLater(NerKubLootChests.getInstance(), () -> {
 			long now = System.currentTimeMillis() / 1000;
 			int count = (int) Arrays.stream(chestInv.getContents())
 					.filter(item -> item != null && item.getType() != Material.AIR)
 					.count();
 
-			// 🔁 Aktualizace hologramu
+			// 🔁 Aktualizuj hologram
 			HologramManager.createOrUpdateLootableHologram(chestName, chest.getLocation(), count);
 
-			// 💾 Uložení času lootu pokud prázdná
+			// 💾 Pokud je prázdná, uložíme timestamp
 			if (count == 0) {
-				YamlConfiguration chestData = NerKubLootChests.getInstance().getChestData();
 				List<Map<?, ?>> list = chestData.getMapList("chests." + chestName + ".locations");
 				List<Map<String, Object>> updated = new ArrayList<>();
 

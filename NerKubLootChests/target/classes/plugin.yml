@@ -1,5 +1,5 @@
 name: NerKubLootChests
-version: '1.0.3'
+version: '1.0.4'
 main: cz.nerkub.nerKubLootChests.NerKubLootChests
 api-version: '1.21'
 
