@@ -1,10 +1,12 @@
 package cz.nerkub.nerKubLootChests.managers;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 
@@ -24,8 +26,7 @@ public class HologramUpdater implements Runnable {
 			ConfigurationSection chest = chests.getConfigurationSection(chestName);
 			if (chest == null) continue;
 
-			final String chestId = chestName; // ✅ pro lambdu
-
+			final String chestId = chestName;
 			int refreshTime = chest.getInt("refreshTime", 300);
 			long last = chest.getLong("lastRefreshed", 0);
 			final int safeTimeLeft = Math.max(0, (int) (refreshTime - (now - last)));
@@ -35,12 +36,15 @@ public class HologramUpdater implements Runnable {
 
 			for (Map<?, ?> locMap : locations) {
 				Location loc = Location.deserialize((Map<String, Object>) locMap);
-				if (loc.getWorld() == null || loc.getBlock().getType() != Material.CHEST) continue;
+				if (loc.getWorld() == null) continue;
+
+				Block block = loc.getBlock();
+				if (!SupportedContainers.VALID_CONTAINERS.contains(block.getType())) continue;
 
 				Bukkit.getScheduler().runTask(NerKubLootChests.getInstance(), () -> {
-					Chest chestBlock = (Chest) loc.getBlock().getState();
-					Inventory inv = chestBlock.getInventory();
+					if (!(block.getState() instanceof Container container)) return;
 
+					Inventory inv = container.getInventory();
 					long items = Arrays.stream(inv.getContents())
 							.filter(Objects::nonNull)
 							.filter(i -> i.getType() != Material.AIR)

@@ -1,14 +1,14 @@
-
 package cz.nerkub.nerKubLootChests.tasks;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import cz.nerkub.nerKubLootChests.utils.ItemSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -33,7 +33,7 @@ public class ChestRefresher implements Runnable {
 			List<Map<?, ?>> originalLocations = chest.getMapList("locations");
 			if (originalLocations == null || originalLocations.isEmpty()) continue;
 
-			// 🎯 Nastavení raritních limitů
+			// 🎯 raritní limity
 			Map<String, Integer> rarityLimits = new HashMap<>();
 			ConfigurationSection limitsSec = chest.getConfigurationSection("rarityLimits");
 			if (limitsSec != null) {
@@ -50,16 +50,15 @@ public class ChestRefresher implements Runnable {
 				Location loc = Location.deserialize(locMap);
 				if (loc.getWorld() == null) continue;
 
-				Object lastVal = locMap.get("lastRefreshed");
-				long last = (lastVal instanceof Number) ? ((Number) lastVal).longValue() : -1L;
+				long last = (rawMap.get("lastRefreshed") instanceof Number n) ? n.longValue() : -1L;
 				long elapsed = (last > 0) ? (now - last) : 0;
 
 				Bukkit.getScheduler().runTask(NerKubLootChests.getInstance(), () -> {
 					Block block = loc.getBlock();
-					if (block.getType() != Material.CHEST) return;
+					if (!SupportedContainers.VALID_CONTAINERS.contains(block.getType())) return;
+					if (!(block.getState() instanceof Container container)) return;
 
-					Chest chestBlock = (Chest) block.getState();
-					Inventory inv = chestBlock.getBlockInventory();
+					Inventory inv = container.getInventory();
 
 					boolean hasItems = Arrays.stream(inv.getContents())
 							.filter(Objects::nonNull)
@@ -87,6 +86,8 @@ public class ChestRefresher implements Runnable {
 						inv.clear();
 
 						List<Map<?, ?>> pool = chest.getMapList("items");
+						if (pool == null || pool.isEmpty()) return;
+
 						List<Map<?, ?>> shuffled = new ArrayList<>(pool);
 						Collections.shuffle(shuffled);
 
@@ -94,8 +95,8 @@ public class ChestRefresher implements Runnable {
 						Map<String, Integer> rarityCount = new HashMap<>();
 
 						for (Map<?, ?> entry : shuffled) {
-							int chance = entry.get("chance") instanceof Number ? ((Number) entry.get("chance")).intValue() : 100;
-							String rarity = (entry.get("rarity") instanceof String) ? ((String) entry.get("rarity")).toUpperCase() : "COMMON";
+							int chance = (entry.get("chance") instanceof Number c) ? c.intValue() : 100;
+							String rarity = (entry.get("rarity") instanceof String r) ? r.toUpperCase() : "COMMON";
 
 							if (Math.random() * 100 < chance) {
 								if (rarityLimits.containsKey(rarity)) {
@@ -103,13 +104,13 @@ public class ChestRefresher implements Runnable {
 									if (current >= rarityLimits.get(rarity)) continue;
 									rarityCount.put(rarity, current + 1);
 								}
+
 								String base64 = (String) entry.get("item");
 								chosen.add(ItemSerializer.itemFromBase64(base64));
 								if (chosen.size() >= itemsPer) break;
 							}
 						}
 
-						// doplnit chybějící položky bez raritního omezení
 						if (chosen.size() < itemsPer) {
 							for (Map<?, ?> entry : shuffled) {
 								String base64 = (String) entry.get("item");

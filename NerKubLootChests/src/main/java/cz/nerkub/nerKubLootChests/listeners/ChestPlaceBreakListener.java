@@ -1,12 +1,17 @@
 package cz.nerkub.nerKubLootChests.listeners;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import cz.nerkub.nerKubLootChests.managers.MessageManager;
 import cz.nerkub.nerKubLootChests.utils.ChestUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
+import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -18,7 +23,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class ChestPlaceBreakListener implements Listener {
 
@@ -28,7 +34,7 @@ public class ChestPlaceBreakListener implements Listener {
 	@EventHandler
 	public void onChestPlace(BlockPlaceEvent event) {
 		ItemStack item = event.getItemInHand();
-		if (item == null || item.getType() != Material.CHEST) return;
+		if (item == null || !SupportedContainers.VALID_CONTAINERS.contains(item.getType())) return;
 
 		ItemMeta meta = item.getItemMeta();
 		if (meta == null || !meta.getPersistentDataContainer().has(CHEST_KEY, PersistentDataType.STRING)) return;
@@ -43,9 +49,7 @@ public class ChestPlaceBreakListener implements Listener {
 
 		Location loc = event.getBlock().getLocation();
 		Map<String, Object> serialized = loc.serialize();
-
-		// Před přidáním nové lokaci se ujistíme, že nastavíme lastRefreshed
-		serialized.put("lastRefreshed", System.currentTimeMillis() / 1000); // Nastavení času na aktuální čas v sekundách
+		serialized.put("lastRefreshed", System.currentTimeMillis() / 1000);
 
 		List<Map<?, ?>> locations = data.getMapList("chests." + chestName + ".locations");
 		if (!locations.contains(serialized)) {
@@ -54,12 +58,12 @@ public class ChestPlaceBreakListener implements Listener {
 			NerKubLootChests.getInstance().saveChestData();
 		}
 
-		// Zápis persistent dat do nové chestky
+		// Zápis persistent dat do nového blocku
 		Bukkit.getScheduler().runTaskLater(NerKubLootChests.getInstance(), () -> {
-			if (loc.getBlock().getType() == Material.CHEST) {
-				Chest placed = (Chest) loc.getBlock().getState();
-				placed.getPersistentDataContainer().set(CHEST_KEY, PersistentDataType.STRING, chestName);
-				placed.update();
+			Block block = loc.getBlock();
+			if (block.getState() instanceof TileState state) {
+				state.getPersistentDataContainer().set(CHEST_KEY, PersistentDataType.STRING, chestName);
+				state.update();
 			}
 		}, 1L);
 
@@ -72,44 +76,45 @@ public class ChestPlaceBreakListener implements Listener {
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		if (event.getBlock().getType() != Material.CHEST) return;
+		Block block = event.getBlock();
 
-		// ❌ Jen hráč smí ničit chestku (žádný výbuch, mob atd.)
+		if (!SupportedContainers.VALID_CONTAINERS.contains(block.getType())) return;
 		if (!(event.getPlayer() instanceof Player player)) {
 			event.setCancelled(true);
 			return;
 		}
 
-		Block block = event.getBlock();
+		if (!(block.getState() instanceof Container container)) return;
 
-		if (!(block.getState() instanceof Chest chest)) return;
-		Location loc1 = chest.getLocation();
+		Location loc = container.getLocation();
+		String chestName = ChestUtils.getChestNameAtLocation(loc);
 
-		// 🧠 Najdi název chestky
-		String chestName = ChestUtils.getChestNameAtLocation(loc1);
-		if (chestName == null || !HologramManager.isFromPluginChest(chest)) return;
+		if (chestName == null) return;
 
-		// 🔒 Permission check
+		// Zkontroluj, že ten block je opravdu lootchest (má persistent key)
+		if (!(container instanceof TileState tileState)) return;
+		if (!tileState.getPersistentDataContainer().has(CHEST_KEY, PersistentDataType.STRING)) return;
+
 		if (!player.hasPermission("lootchest.admin")) {
 			event.setCancelled(true);
 			player.sendMessage(MessageManager.get("messages.no_permission"));
 			return;
 		}
 
-		// 🗂️ Odstranit lokaci z chests.yml
+		// Odstraň lokaci z configu
 		YamlConfiguration data = NerKubLootChests.getInstance().getChestData();
 		List<Map<?, ?>> locations = data.getMapList("chests." + chestName + ".locations");
 
 		locations.removeIf(map -> {
-			Location loc = Location.deserialize((Map<String, Object>) map);
-			return loc.equals(chest.getLocation());
+			Location stored = Location.deserialize((Map<String, Object>) map);
+			return stored.equals(loc);
 		});
 
 		data.set("chests." + chestName + ".locations", locations);
 		NerKubLootChests.getInstance().saveChestData();
 
-		// 🧹 Odstranit hologram
-		HologramManager.removeHologram(chest.getLocation());
+		// Odstranit hologram
+		HologramManager.removeHologram(loc);
 
 		player.sendMessage(MessageManager.get("messages.broken", "name", chestName));
 	}

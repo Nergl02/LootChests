@@ -1,6 +1,7 @@
 package cz.nerkub.nerKubLootChests.listeners;
 
 import cz.nerkub.nerKubLootChests.gui.AddLootItemsMenu;
+import cz.nerkub.nerKubLootChests.gui.BlockTypeSelectorMenu;
 import cz.nerkub.nerKubLootChests.gui.ConfirmDeleteMenu;
 import cz.nerkub.nerKubLootChests.gui.EditLootItemsMenu;
 import cz.nerkub.nerKubLootChests.managers.ChestDataManager;
@@ -61,6 +62,13 @@ public class EditChestMenuListener implements Listener {
 				ConfirmDeleteCache.set(player, chestName);
 				EditLootItemsMenu.open(player, chestName);
 			}
+
+			case 28 -> {
+				player.closeInventory();
+				ConfirmDeleteCache.set(player, chestName);
+				BlockTypeSelectorMenu.open(player, chestName);
+			}
+
 
 			case 30 -> {
 				player.closeInventory();

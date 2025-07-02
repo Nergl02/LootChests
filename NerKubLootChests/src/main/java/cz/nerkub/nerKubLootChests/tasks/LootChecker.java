@@ -1,12 +1,13 @@
 package cz.nerkub.nerKubLootChests.tasks;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.Inventory;
 
@@ -25,9 +26,7 @@ public class LootChecker implements Runnable {
 			ConfigurationSection chest = data.getConfigurationSection("chests." + chestName);
 			if (chest == null) continue;
 
-			long last = chest.getLong("lastRefreshed", 0);
 			int interval = chest.getInt("refreshTime", 300);
-
 			List<Map<?, ?>> locations = chest.getMapList("locations");
 			if (locations == null || locations.isEmpty()) continue;
 
@@ -35,33 +34,33 @@ public class LootChecker implements Runnable {
 				Location loc = Location.deserialize((Map<String, Object>) raw);
 				if (loc.getWorld() == null) continue;
 
-				long locationLast = 0;
+				long lastRefreshed = 0;
 				Object rawLast = raw.get("lastRefreshed");
-				if (rawLast instanceof Number) {
-					locationLast = ((Number) rawLast).longValue();
+				if (rawLast instanceof Number num) {
+					lastRefreshed = num.longValue();
 				}
 
-				long finalLocationLast = locationLast; // <- tohle udělá z proměnné immutable kopii
+				long finalLastRefreshed = lastRefreshed;
 
 				Bukkit.getScheduler().runTask(NerKubLootChests.getInstance(), () -> {
 					Block block = loc.getBlock();
-					if (block.getType() != Material.CHEST) return;
+					Material type = block.getType();
 
-					Chest chestBlock = (Chest) block.getState();
-					Inventory inv = chestBlock.getBlockInventory();
+					if (!SupportedContainers.VALID_CONTAINERS.contains(type)) return;
+					if (!(block.getState() instanceof Container container)) return;
+
+					Inventory inv = container.getInventory();
 
 					boolean hasItems = Arrays.stream(inv.getContents())
 							.filter(Objects::nonNull)
-							.anyMatch(i -> i.getType() != Material.AIR);
+							.anyMatch(item -> item.getType() != Material.AIR);
 
-					if (!hasItems && now - finalLocationLast < interval) {
-						int timeLeft = (int) (interval - (now - finalLocationLast));
+					if (!hasItems && now - finalLastRefreshed < interval) {
+						int timeLeft = (int) (interval - (now - finalLastRefreshed));
 						HologramManager.spawnCountdown(loc, chestName, timeLeft);
 					}
 				});
-
 			}
-
 		}
 	}
 }

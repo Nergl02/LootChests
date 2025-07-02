@@ -1,6 +1,7 @@
 package cz.nerkub.nerKubLootChests.listeners;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import cz.nerkub.nerKubLootChests.managers.MessageManager;
 import org.bukkit.Bukkit;
@@ -8,12 +9,13 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
+import org.bukkit.block.TileState;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -25,37 +27,36 @@ public class ChestInteractListener implements Listener {
 			new NamespacedKey(NerKubLootChests.getInstance(), "lootchest");
 
 	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {
-		if (!(event.getWhoClicked() instanceof Player player)) return;
+	public void onInventoryOpen(InventoryOpenEvent event) {
+		if (!(event.getPlayer() instanceof Player player)) return;
 
-		Inventory inv = player.getOpenInventory().getTopInventory();
-		if (inv.getType() != org.bukkit.event.inventory.InventoryType.CHEST) return;
+		Inventory inv = event.getInventory();
+		Block block = inv.getLocation() != null ? inv.getLocation().getBlock() : null;
 
-		// 🎯 Získání truhly podle mířeného bloku
-		Block block = player.getTargetBlockExact(5);
-		if (block == null || !(block.getState() instanceof Chest chest)) return;
+		// Zajistíme, že blok existuje a je platný kontejner
+		if (block == null || !SupportedContainers.VALID_CONTAINERS.contains(block.getType())) return;
+		if (!(block.getState() instanceof Container container)) return;
+		if (!(block.getState() instanceof TileState tileState)) return;
 
-		// ✅ Ověření, zda chestka má pluginový PersistentData tag
-		var container = chest.getPersistentDataContainer();
-		if (!container.has(CHEST_KEY, PersistentDataType.STRING)) return;
-
-		String chestName = container.get(CHEST_KEY, PersistentDataType.STRING);
+		// Má persistentní tag?
+		if (!tileState.getPersistentDataContainer().has(CHEST_KEY, PersistentDataType.STRING)) return;
+		String chestName = tileState.getPersistentDataContainer().get(CHEST_KEY, PersistentDataType.STRING);
 		if (chestName == null) return;
 
 		YamlConfiguration chestData = NerKubLootChests.getInstance().getChestData();
 		if (!chestData.contains("chests." + chestName)) return;
 
-		Inventory chestInv = chest.getInventory();
-
-		// 🧠 Odloženo o 1 tick kvůli async click eventu
+		// 🧠 Odloženo kvůli async
 		Bukkit.getScheduler().runTaskLater(NerKubLootChests.getInstance(), () -> {
+			Inventory containerInv = container.getInventory();
+
 			long now = System.currentTimeMillis() / 1000;
-			int count = (int) Arrays.stream(chestInv.getContents())
+			int count = (int) Arrays.stream(containerInv.getContents())
 					.filter(item -> item != null && item.getType() != Material.AIR)
 					.count();
 
 			// 🔁 Aktualizuj hologram
-			HologramManager.createOrUpdateLootableHologram(chestName, chest.getLocation(), count);
+			HologramManager.createOrUpdateLootableHologram(chestName, container.getLocation(), count);
 
 			// 💾 Pokud je prázdná, uložíme timestamp
 			if (count == 0) {
@@ -67,7 +68,7 @@ public class ChestInteractListener implements Listener {
 					raw.forEach((k, v) -> map.put(k.toString(), v));
 
 					Location entryLoc = Location.deserialize(map);
-					if (entryLoc.equals(chest.getLocation())) {
+					if (entryLoc.equals(container.getLocation())) {
 						map.put("lastLooted", now);
 					}
 

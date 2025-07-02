@@ -7,6 +7,12 @@ gui:
   edit_chest_title: "Edit: {chest}"
   loot_items_title: "Loot Items: {chest}"
   chance_editor_title: "Chance Editor"
+  block_type_selector_title: "Select Block Type – {chest}"
+  blocktype_title_prefix: "Select Block Type"
+  block_type_selector_lore:
+    - "&7Click to select this block type"
+    - ""
+    - "&eWill replace all existing blocks"
 
   current_chance_lore:
     - "&eCurrent Chance: &a{chance}%"
@@ -71,6 +77,9 @@ messages:
   usage: "{prefix}&cUsage: /lootchest <create|add|loottime|edit|delete|get>"
   subcommand_invalid: "{prefix}&cInvalid subcommand."
 
+  blocktype_updated: "✔ Block type for {name} set to {block}."
+  blocktype_gui_title: "Select LootChest Block"
+
   usage_create: "{prefix}&cUsage: /lootchest create <chestName>"
   already_exists: "{prefix}&cA loot chest with that name already exists!"
   created: "{prefix}&aChest '{name}' was created and added to your inventory."
@@ -120,3 +129,5 @@ messages:
   not_registered: "{prefix}&cLootChest type '{name}' is not registered."
   broken: "{prefix}&eLootChest '{name}' was removed."
   loot_failed: "{prefix}&cFailed to identify chest type at this location."
+
+  blocktype_selected: "&a✔ Selected block type: &f{material}"

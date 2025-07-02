@@ -2,6 +2,7 @@ package cz.nerkub.nerKubLootChests.managers;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
@@ -123,10 +124,13 @@ public class HologramManager {
 
 			for (Map<?, ?> map : locationMaps) {
 				Location loc = Location.deserialize((Map<String, Object>) map);
-				if (loc.getWorld() == null || loc.getBlock().getType() != Material.CHEST) continue;
+				if (loc.getWorld() == null) continue;
 
-				Chest chest = (Chest) loc.getBlock().getState();
-				Inventory inv = chest.getBlockInventory();
+				Block block = loc.getBlock();
+				if (!cz.nerkub.nerKubLootChests.SupportedContainers.VALID_CONTAINERS.contains(block.getType())) continue;
+				if (!(block.getState() instanceof org.bukkit.block.Container container)) continue;
+
+				Inventory inv = container.getInventory();
 				boolean hasItems = Arrays.stream(inv.getContents())
 						.filter(Objects::nonNull)
 						.anyMatch(item -> item.getType() != Material.AIR);
@@ -142,6 +146,7 @@ public class HologramManager {
 				}
 			}
 		}
+
 		if (NerKubLootChests.getInstance().getConfig().getBoolean("debug")) {
 			System.out.println("♻️ [Hologram] Reload all holograms.");
 		}
@@ -171,12 +176,14 @@ public class HologramManager {
 		return new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 	}
 
+	@Deprecated
 	public static boolean isFromPluginChest(Chest chest) {
 		if (chest == null) return false;
 		var container = chest.getPersistentDataContainer();
 		var key = new NamespacedKey(NerKubLootChests.getInstance(), "lootchest");
 		return container.has(key, PersistentDataType.STRING);
 	}
+
 
 	public static void spawnCountdown(Location loc, String chestName, int timeLeft) {
 		String displayName = getDisplayNameFromChest(chestName);

@@ -1,6 +1,7 @@
 package cz.nerkub.nerKubLootChests.commands;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
+import cz.nerkub.nerKubLootChests.SupportedContainers;
 import cz.nerkub.nerKubLootChests.gui.EditChestMenu;
 import cz.nerkub.nerKubLootChests.managers.HologramManager;
 import cz.nerkub.nerKubLootChests.managers.MessageManager;
@@ -246,25 +247,35 @@ public class LootChestCommand implements CommandExecutor {
 		}
 
 		String chestName = args[1].toLowerCase();
-		var chestData = NerKubLootChests.getInstance().getChestData();
+		YamlConfiguration chestData = NerKubLootChests.getInstance().getChestData();
 
 		if (!chestData.contains("chests." + chestName)) {
 			player.sendMessage(MessageManager.get("messages.chest_not_found", "name", chestName));
 			return;
 		}
 
-		ItemStack chest = new ItemStack(Material.CHEST);
-		ItemMeta meta = chest.getItemMeta();
+		String matName = chestData.getString("chests." + chestName + ".blockType", Material.CHEST.name());
+		Material blockType = Material.matchMaterial(matName);
 
-		assert meta != null;
-		meta.setDisplayName(ChatColor.GOLD + "LootChest: " + chestName);
-		NamespacedKey key = new NamespacedKey(NerKubLootChests.getInstance(), "lootchest");
-		meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, chestName);
-		chest.setItemMeta(meta);
+		if (blockType == null || !SupportedContainers.VALID_CONTAINERS.contains(blockType)) {
+			blockType = Material.CHEST; // fallback
+		}
 
-		player.getInventory().addItem(chest);
-		player.sendMessage(MessageManager.get("messages.given", "name", chestName));
+		ItemStack item = new ItemStack(blockType);
+		ItemMeta meta = item.getItemMeta();
+
+		if (meta != null) {
+			meta.setDisplayName(ChatColor.GOLD + "LootChest: " + chestName);
+			NamespacedKey key = new NamespacedKey(NerKubLootChests.getInstance(), "lootchest");
+			meta.getPersistentDataContainer().set(key, PersistentDataType.STRING, chestName);
+			item.setItemMeta(meta);
+			player.getInventory().addItem(item);
+			player.sendMessage(MessageManager.get("messages.given", "name", chestName));
+		} else {
+			player.sendMessage("§cChyba: Nelze vytvořit předmět pro typ: " + blockType.name());
+		}
 	}
+
 
 	private void handleEdit(Player player, String[] args) {
 		if (args.length < 2) {

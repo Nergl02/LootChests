@@ -47,6 +47,15 @@ public class EditChestMenu implements Listener {
 		// 🎁 Edit Loot
 		inv.setItem(16, GUIUtils.createItem(Material.CHEST, MessageManager.get("gui.edit_loot_items_button")));
 
+		// 🧱 Block Type Selector
+		inv.setItem(28, GUIUtils.createItem(
+				Material.BRICKS,
+				MessageManager.get("gui.blocktype_title_prefix"),
+				MessageManager.getList("gui.block_type_selector_lore",
+						"value", data.getString("chests." + chestName + ".blockType", "CHEST"))
+		));
+
+
 		// ➕ Add items
 		inv.setItem(30, GUIUtils.createItem(Material.EMERALD_BLOCK, MessageManager.get("gui.add_items_button")));
 
