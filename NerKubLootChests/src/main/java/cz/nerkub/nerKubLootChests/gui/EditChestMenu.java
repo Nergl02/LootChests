@@ -24,10 +24,15 @@ public class EditChestMenu implements Listener {
 		int itemsPer = data.getInt("chests." + chestName + ".itemsPerRefresh", 3);
 
 		// 🏷 Display Name
+		String guiTitle = data.getString("chests." + chestName + ".guiTitle", "§8LootChest");
+
 		inv.setItem(10, GUIUtils.createItem(
 				Material.NAME_TAG,
 				MessageManager.get("gui.display_name_button"),
-				MessageManager.getList("gui.display_name_lore", "value", displayName)
+				MessageManager.getList("gui.display_name_lore",
+						"display", displayName,
+						"title", guiTitle
+				)
 		));
 
 		// ⏱ Refresh Time
@@ -50,7 +55,7 @@ public class EditChestMenu implements Listener {
 		// 🧱 Block Type Selector
 		inv.setItem(28, GUIUtils.createItem(
 				Material.BRICKS,
-				MessageManager.get("gui.blocktype_title_prefix"),
+				MessageManager.get("gui.block_type_title_prefix"),
 				MessageManager.getList("gui.block_type_selector_lore",
 						"value", data.getString("chests." + chestName + ".blockType", "CHEST"))
 		));

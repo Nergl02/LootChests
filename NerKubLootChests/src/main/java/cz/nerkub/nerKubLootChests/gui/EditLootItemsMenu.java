@@ -5,6 +5,7 @@ import cz.nerkub.nerKubLootChests.managers.MessageManager;
 import cz.nerkub.nerKubLootChests.utils.GUIUtils;
 import cz.nerkub.nerKubLootChests.utils.ItemSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -12,36 +13,33 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class EditLootItemsMenu {
 
-	public static void open(Player player, String chestName) {
+	public static void open(Player player, String chestName, int page) {
 		YamlConfiguration data = NerKubLootChests.getInstance().getChestData();
 		List<Map<?, ?>> items = data.getMapList("chests." + chestName + ".items");
+		if (items == null) items = new ArrayList<>();
 
-		String title = MessageManager.get("gui.loot_items_title", "chest", chestName);
+		int itemsPerPage = 45;
+		int totalPages = (int) Math.ceil((double) items.size() / itemsPerPage);
+		if (page < 0) page = 0;
+		if (page >= totalPages) page = totalPages - 1;
+
+		String baseTitle = MessageManager.get("gui.loot_items_title", "chest", chestName);
+		String title = ChatColor.DARK_GRAY + baseTitle + " - Page " + (page + 1);
 		Inventory gui = Bukkit.createInventory(null, 6 * 9, title);
 
-		int index = 0;
-		for (Map<?, ?> entry : items) {
-			if (index >= 45) break;
+		int startIndex = page * itemsPerPage;
+		int endIndex = Math.min(startIndex + itemsPerPage, items.size());
 
+		for (int i = startIndex; i < endIndex; i++) {
+			Map<?, ?> entry = items.get(i);
 			String base64 = (String) entry.get("item");
 
-			int chance = 100;
-			Object chanceObj = entry.get("chance");
-			if (chanceObj instanceof Number) {
-				chance = ((Number) chanceObj).intValue();
-			}
-
-			String rarity = "COMMON";
-			Object rarityObj = entry.get("rarity");
-			if (rarityObj instanceof String) {
-				rarity = ((String) rarityObj).toUpperCase();
-			}
+			int chance = entry.get("chance") instanceof Number ? ((Number) entry.get("chance")).intValue() : 100;
+			String rarity = entry.get("rarity") instanceof String ? ((String) entry.get("rarity")).toUpperCase() : "COMMON";
 
 			ItemStack item = ItemSerializer.itemFromBase64(base64);
 			ItemMeta meta = item.getItemMeta();
@@ -52,22 +50,18 @@ public class EditLootItemsMenu {
 				meta.setLore(lore);
 				item.setItemMeta(meta);
 			}
-
-			gui.setItem(index++, item);
+			gui.setItem(i - startIndex, item); // GUI slot
 		}
 
-		gui.setItem(53, GUIUtils.createItem(Material.BARRIER, MessageManager.get("gui.back")));
-		player.openInventory(gui);
-	}
+		// Navigační tlačítka
+		// Navigační tlačítka
+		if (page > 0)
+			gui.setItem(45, GUIUtils.createItem(Material.ARROW, MessageManager.get("gui.previous_page_button")));
 
-	private static String getRarityColor(String rarity) {
-		return switch (rarity.toUpperCase()) {
-			case "COMMON" -> "§7";
-			case "UNCOMMON" -> "§a";
-			case "RARE" -> "§9";
-			case "EPIC" -> "§d";
-			case "LEGENDARY" -> "§6";
-			default -> "§f";
-		};
+		if (page < totalPages - 1)
+			gui.setItem(53, GUIUtils.createItem(Material.ARROW, MessageManager.get("gui.next_page_button")));
+
+		gui.setItem(49, GUIUtils.createItem(Material.BARRIER, MessageManager.get("gui.back")));
+		player.openInventory(gui);
 	}
 }

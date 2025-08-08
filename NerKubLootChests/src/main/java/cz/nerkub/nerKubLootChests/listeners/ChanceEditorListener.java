@@ -48,7 +48,7 @@ public class ChanceEditorListener implements Listener {
 			case 50 -> {
 				player.sendMessage(MessageManager.get("messages.edit_canceled"));
 				TempItemCache.endSession(player);
-				EditLootItemsMenu.open(player, editing.chestName);
+				EditLootItemsMenu.open(player, editing.chestName, editing.page);
 				return;
 			}
 
@@ -73,7 +73,7 @@ public class ChanceEditorListener implements Listener {
 				}
 
 				TempItemCache.endSession(player);
-				EditLootItemsMenu.open(player, editing.chestName);
+				EditLootItemsMenu.open(player, editing.chestName, editing.page);
 				return;
 			}
 		}

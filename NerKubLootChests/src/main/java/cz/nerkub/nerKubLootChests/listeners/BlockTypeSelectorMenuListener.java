@@ -23,7 +23,7 @@ public class BlockTypeSelectorMenuListener implements Listener {
 
 		Inventory inv = e.getInventory();
 		String title = e.getView().getTitle();
-		if (!title.contains(MessageManager.get("gui.blocktype_title_prefix"))) return;
+		if (!title.contains(MessageManager.get("gui.block_type_title_prefix"))) return;
 
 		e.setCancelled(true);
 

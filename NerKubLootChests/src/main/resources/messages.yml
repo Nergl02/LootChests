@@ -7,8 +7,8 @@ gui:
   edit_chest_title: "Edit: {chest}"
   loot_items_title: "Loot Items: {chest}"
   chance_editor_title: "Chance Editor"
-  block_type_selector_title: "Select Block Type – {chest}"
-  blocktype_title_prefix: "Select Block Type"
+  block_type_selector_title: "&fSelect Block Type – {chest}"
+  block_type_title_prefix: "Select Block Type"
   block_type_selector_lore:
     - "&7Click to select this block type"
     - ""
@@ -41,11 +41,16 @@ gui:
   confirm_add_items: "&aConfirm adding"
   cancel_add_items: "&cCancel"
 
+  next_page_button: "&e▶ Next Page"
+  previous_page_button: "&e◀ Previous Page"
+
   display_name_button: "&eDisplay Name"
   display_name_lore:
-    - "&7Current: {value}"
+    - "&7Display Name: {display}"
+    - "&7GUI Title: {title}"
     - ""
-    - "&eClick to change"
+    - "&eLeft Click: change display name"
+    - "&eRight Click: change GUI title"
 
   refresh_time_button: "&bSet Refresh Time"
   refresh_time_lore:
@@ -113,6 +118,7 @@ messages:
   usage_edit: "{prefix}&cUsage: /lootchest edit <chestName>"
 
   chat_display_name: "{prefix}&7Type a new &eDisplay Name &7in the chat..."
+  chat_gui_title: "{prefix}&7Type new &bGUI Title &7in chat..."
   chat_refresh_time: "{prefix}&7Type new &brefreshTime &7in seconds..."
   chat_items_per_refresh: "{prefix}&7Type new &ditem count &7per refresh..."
 
@@ -120,6 +126,7 @@ messages:
   item_not_found: "{prefix}&eCould not find the item."
 
   display_name_set: "{prefix}&aDisplay name set to: &f{value}"
+  gui_title_set: "{prefix}&aGUI Title set to: &f{value}"
   refresh_time_set: "{prefix}&aRefresh time set to &b{time}s"
   items_per_refresh_set: "{prefix}&aItems per refresh set to &d{amount}"
   invalid_time_input: "{prefix}&cInvalid input. Enter a valid number greater than 0."

@@ -38,9 +38,14 @@ public class EditChestMenuListener implements Listener {
 		switch (event.getSlot()) {
 			case 10 -> {
 				player.closeInventory();
-				player.sendMessage(MessageManager.get("messages.chat_display_name"));
 				ConfirmDeleteCache.set(player, chestName);
-				ChestDataManager.awaitDisplayNameInput(player, chestName);
+				if (event.isLeftClick()) {
+					player.sendMessage(MessageManager.get("messages.chat_display_name"));
+					ChestDataManager.awaitDisplayNameInput(player, chestName);
+				} else if (event.isRightClick()) {
+					player.sendMessage(MessageManager.get("messages.chat_gui_title"));
+					ChestDataManager.awaitGuiTitleInput(player, chestName);
+				}
 			}
 
 			case 12 -> {
@@ -60,7 +65,7 @@ public class EditChestMenuListener implements Listener {
 			case 16 -> {
 				player.closeInventory();
 				ConfirmDeleteCache.set(player, chestName);
-				EditLootItemsMenu.open(player, chestName);
+				EditLootItemsMenu.open(player, chestName, 0);
 			}
 
 			case 28 -> {

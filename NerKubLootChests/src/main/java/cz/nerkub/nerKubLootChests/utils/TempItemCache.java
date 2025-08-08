@@ -31,8 +31,8 @@ public class TempItemCache {
 	}
 
 	// 📦 Editing item info (for chance editing)
-	public static void setEditingItem(Player player, String chestName, int index, ItemStack item, int chance, String rarity) {
-		editingItems.put(player, new EditingItemInfo(chestName, index, item, chance, rarity));
+	public static void setEditingItem(Player player, String chestName, int index, int page, ItemStack item, int chance, String rarity) {
+		editingItems.put(player, new EditingItemInfo(chestName, index, page, item, chance, rarity));
 	}
 
 	public static EditingItemInfo getEditingItem(Player player) {
@@ -46,17 +46,18 @@ public class TempItemCache {
 	public static class EditingItemInfo {
 		public final String chestName;
 		public final int index;
+		public final int page; // ✅ Přidáno
 		public final ItemStack item;
 		public int chance;
 		public String rarity;
 
-		public EditingItemInfo(String chestName, int index, ItemStack item, int chance, String rarity) {
+		public EditingItemInfo(String chestName, int index, int page, ItemStack item, int chance, String rarity) {
 			this.chestName = chestName;
 			this.index = index;
+			this.page = page;
 			this.item = item;
 			this.chance = chance;
 			this.rarity = rarity;
 		}
 	}
-
 }

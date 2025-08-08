@@ -1,10 +1,7 @@
 package cz.nerkub.nerKubLootChests.utils;
 
 import cz.nerkub.nerKubLootChests.NerKubLootChests;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.configuration.ConfigurationSection;
@@ -68,5 +65,28 @@ public class ChestUtils {
 			}
 		}
 	}
+
+	// ChestUtils.java
+	public static void applyGuiTitleToAllBlocks(String chestName) {
+		YamlConfiguration data = NerKubLootChests.getInstance().getChestData();
+		String guiTitle = data.getString("chests." + chestName + ".guiTitle",
+				data.getString("chests." + chestName + ".displayName", chestName));
+		String colored = ChatColor.translateAlternateColorCodes('&', guiTitle);
+
+		List<Map<?, ?>> locMaps = data.getMapList("chests." + chestName + ".locations");
+		if (locMaps == null) return;
+
+		Bukkit.getScheduler().runTask(NerKubLootChests.getInstance(), () -> {
+			for (Map<?, ?> raw : locMaps) {
+				Location loc = Location.deserialize((Map<String, Object>) raw);
+				if (loc.getWorld() == null) continue;
+				Block block = loc.getBlock();
+				if (!(block.getState() instanceof org.bukkit.block.Container container)) continue;
+				container.setCustomName(colored); // <- důležité
+				container.update();
+			}
+		});
+	}
+
 
 }

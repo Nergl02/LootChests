@@ -65,6 +65,17 @@ public class ChestPlaceBreakListener implements Listener {
 				state.getPersistentDataContainer().set(CHEST_KEY, PersistentDataType.STRING, chestName);
 				state.update();
 			}
+
+			// Nastav GUI titulek přímo na kontejner
+			String guiTitle = data.getString("chests." + chestName + ".guiTitle",
+					data.getString("chests." + chestName + ".displayName", chestName));
+			String colored = org.bukkit.ChatColor.translateAlternateColorCodes('&', guiTitle);
+
+			var stateNow = block.getState();
+			if (stateNow instanceof org.bukkit.block.Container container) {
+				container.setCustomName(colored);
+				container.update();
+			}
 		}, 1L);
 
 		String displayName = data.getString("chests." + chestName + ".displayName", chestName);
